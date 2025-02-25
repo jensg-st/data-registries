@@ -1,0 +1,17 @@
+x-direktiv-api: endpoint/v2
+
+x-direktiv-config:
+  path: "/testme"
+  allow_anonymous: true
+  plugins:
+    target: 
+      type: instant-response
+      configuration:
+        status_code: 200
+        status_message: hello
+get:
+  security:
+        - defaultApiKey: []
+  responses:
+    "200":
+      description: returns something
