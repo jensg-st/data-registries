@@ -1,0 +1,23 @@
+direktiv_api: workflow/v1
+description: A simple 'action' state that sends a get request
+functions:
+- id: get
+  service: /services/http.yaml
+  type: knative-namespace
+states:
+- id: getter 
+  type: action
+  action:
+    function: get
+    input: 
+      method: "GET"
+      url: "https://policy.direktiv.io/api/v1/pap/projects/data-registry/files/tree/?path=data_registries/"
+      headers:
+        Authorization: admin123#
+  transition: return
+- id: return
+  log: jq(.)
+  type: noop
+  transform:
+    buckets: jq([.return.body.data.children[] | select(.isDirectory = true) | .path | split("/data_registries/")[1]])
+      
