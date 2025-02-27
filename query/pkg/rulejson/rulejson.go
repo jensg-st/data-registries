@@ -102,15 +102,11 @@ func validate(rule *Rule, errs *[]RuleError) {
 	if rule.Type == "attribute" {
 		var err error
 		switch rule.Operator {
-		case "equal":
-			val := &TargetValue{}
-			err = json.Unmarshal(rule.Assert, val)
-			rule.ParsedTarget = val
 		case "range":
 			val := &TargetRange{}
 			err = json.Unmarshal(rule.Assert, val)
 			rule.ParsedTarget = val
-		case "isSubstringOf":
+		case "equal", "isSubstringOf", "matchesWildcard":
 			val := &TargetValue{}
 			err = json.Unmarshal(rule.Assert, val)
 			rule.ParsedTarget = val

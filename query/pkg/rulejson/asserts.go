@@ -25,6 +25,8 @@ func sqlCompileTarget(operator string, a any, attr RuleAttribute) string {
 		return sqlCompileTargetRange(a, attr)
 	case "isSubstringOf":
 		return sqlCompileTargetIsSubstringOf(a, attr)
+	case "matchesWildcard":
+		return sqlCompileTargetMatchesWildcard(a, attr)
 	default:
 		return "N/A"
 	}
@@ -38,6 +40,8 @@ func evaluateTarget(operator string, a any, input string, kind string) bool {
 		return targetRange(a, input, kind)
 	case "isSubstringOf":
 		return targetIsSubstringOf(a, input, kind)
+	case "matchesWildcard":
+		return targetMatchesWildcard(a, input, kind)
 	default:
 		return false
 	}
@@ -66,6 +70,13 @@ func targetIsSubstringOf(a any, value string, kind string) bool {
 	return strings.Contains(target.Value, value)
 }
 
+func targetMatchesWildcard(a any, value string, kind string) bool {
+	//nolint:forcetypeassert
+	target := a.(*TargetValue)
+
+	return strings.Contains(target.Value, value)
+}
+
 func sqlCompileTargetEqual(a any, atrr RuleAttribute) string {
 	//nolint:forcetypeassert
 	target := a.(*TargetValue)
@@ -88,4 +99,11 @@ func sqlCompileTargetIsSubstringOf(a any, atrr RuleAttribute) string {
 	target := a.(*TargetValue)
 
 	return fmt.Sprintf(`%s LIKE %%%v%%`, atrr.Name, target.Value)
+}
+
+func sqlCompileTargetMatchesWildcard(a any, atrr RuleAttribute) string {
+	//nolint:forcetypeassert
+	target := a.(*TargetValue)
+
+	return fmt.Sprintf(`%s LIKE '%v'`, atrr.Name, target.Value)
 }

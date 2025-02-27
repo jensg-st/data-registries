@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -57,7 +58,7 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 
 	userAttrs := map[string]string{}
 	for i := range obj.Query.User {
-		userAttrs[obj.Query.User[i].Name] = obj.Query.User[i].Value
+		userAttrs["user."+obj.Query.User[i].Name] = obj.Query.User[i].Value
 	}
 
 	whereClauses := []string{}
@@ -75,23 +76,26 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		rule.Stringer()
-		whereClauses = append(whereClauses, rule.Stringer())
+		str := strings.ReplaceAll(rule.Stringer(), "data.", "")
+		whereClauses = append(whereClauses, str)
 	}
 
 	result := "WHERE (" + strings.Join(whereClauses, ") OR (") + ")"
+	encoded := base64.StdEncoding.EncodeToString([]byte(result))
 
-	writeJSON(w, result)
+	writeJSON(w, result, encoded)
 }
 
-func writeJSON(w http.ResponseWriter, v any) {
+func writeJSON(w http.ResponseWriter, data string, base64 string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	payLoad := struct {
-		Data any `json:"data"`
+		Data   any    `json:"data"`
+		Base64 string `json:"base64"`
 	}{
-		Data: v,
+		Data:   data,
+		Base64: base64,
 	}
 	_ = json.NewEncoder(w).Encode(payLoad)
 }
