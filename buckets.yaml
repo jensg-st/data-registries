@@ -19,12 +19,13 @@ states:
 - id: return
   log: jq(.)
   type: noop
+  # p = attrs[i].path + "/" + attrs[i].config.table 
   transform: |- 
       js(
         attrs = data["return"]["body"]["data"]
         var a=[]
         for (var i = 0; i < attrs.length; i++) {
-          p = attrs[i].path + "/" + attrs[i].config.table 
+          p = attrs[i].path
           a.push(p.split(/\/(.+)?/)[1]) 
         }
 
