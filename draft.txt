@@ -1,0 +1,111 @@
+curl --request POST \
+  --url http://localhost:8080 \
+  --data '{
+            "path": "/data_registries/postgres-demo/demo1.dar.json",
+            "data": {
+              "policy": {
+                "type": "group",
+                "operator": "AND",
+                "items": [
+                  {
+                    "type": "bool",
+                    "operator": "true"
+                  },
+                  {
+                    "type": "group",
+                    "operator": "OR",
+                    "items": [
+                      {
+                        "type": "group",
+                        "operator": "AND",
+                        "items": [
+                          {
+                            "type": "attribute",
+                            "operator": "equal",
+                            "assert": {
+                              "value": "Hamburg"
+                            },
+                            "attribute": {
+                              "name": "user.city",
+                              "kind": "string"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "group",
+                        "operator": "AND",
+                        "items": [
+                          {
+                            "type": "attribute",
+                            "operator": "equal",
+                            "assert": {
+                              "value": "Berlin"
+                            },
+                            "attribute": {
+                              "name": "user.city",
+                              "kind": "string"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "attribute",
+                    "operator": "equal",
+                    "assert": {
+                      "value": "hello"
+                    },
+                    "attribute": {
+                      "name": "data.work_order",
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "type": "group",
+                    "operator": "OR",
+                    "items": [
+                      {
+                        "type": "group",
+                        "operator": "AND",
+                        "items": [
+                          {
+                            "type": "attribute",
+                            "operator": "equal",
+                            "assert": {
+                              "value": "world"
+                            },
+                            "attribute": {
+                              "name": "data.work_order",
+                              "kind": "string"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "group",
+                        "operator": "AND",
+                        "items": [
+                          {
+                            "type": "attribute",
+                            "operator": "equal",
+                            "assert": {
+                              "value": "world3"
+                            },
+                            "attribute": {
+                              "name": "data.work_order",
+                              "kind": "string"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "meta": {
+                "description": ""
+              }
+            }
+          }'
