@@ -46,6 +46,7 @@ func reportError(w http.ResponseWriter, code string, err error) {
 }
 
 func coreLogic(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("1")
 	obj := new(input)
 	aid, err := da.Unmarshal(obj, r)
 	if err != nil {
@@ -53,14 +54,14 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 		reportError(w, "inputUnmarshal", err)
 		return
 	}
-
+	fmt.Println("2")
 	da.LogDouble(aid, "Hello")
 
 	userAttrs := map[string]string{}
 	for i := range obj.Query.User {
 		userAttrs["user."+obj.Query.User[i].Name] = obj.Query.User[i].Value
 	}
-
+	fmt.Println("3")
 	whereClauses := []string{}
 	for i := range obj.Query.Policies {
 		rule := &obj.Query.Policies[i]
@@ -80,9 +81,9 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 		whereClauses = append(whereClauses, str)
 	}
 
-	result := "WHERE " + strings.Join(whereClauses, " OR ")
+	result := strings.Join(whereClauses, " OR ")
 	encoded := base64.StdEncoding.EncodeToString([]byte(result))
-
+	fmt.Println("4")
 	writeJSON(w, result, encoded)
 }
 
