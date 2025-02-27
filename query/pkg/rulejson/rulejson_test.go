@@ -20,7 +20,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "valid equal",
 			operator: "equal",
-			target: &TargetEqual{
+			target: &TargetValue{
 				Value: "123",
 			},
 			input:     "123",
@@ -32,7 +32,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "invalid equal",
 			operator: "equal",
-			target: &TargetEqual{
+			target: &TargetValue{
 				Value: "124",
 			},
 			input:     "123",
@@ -44,7 +44,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "is_substring_of_1",
 			operator: "isSubstringOf",
-			target: &TargetIsSubstringOf{
+			target: &TargetValue{
 				Value: "123456",
 			},
 			input:     "56",
@@ -56,7 +56,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "is_substring_of_1",
 			operator: "isSubstringOf",
-			target: &TargetIsSubstringOf{
+			target: &TargetValue{
 				Value: "123456",
 			},
 			input:     "12",
@@ -68,7 +68,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "is_substring_of_1",
 			operator: "isSubstringOf",
-			target: &TargetIsSubstringOf{
+			target: &TargetValue{
 				Value: "123456",
 			},
 			input:     "56",
@@ -80,7 +80,7 @@ func TestEvaluateTarget(t *testing.T) {
 		{
 			name:     "is_substring_of_2",
 			operator: "isSubstringOf",
-			target: &TargetIsSubstringOf{
+			target: &TargetValue{
 				Value: "123456",
 			},
 			input:     "46",

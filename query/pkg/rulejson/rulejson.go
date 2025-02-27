@@ -103,7 +103,7 @@ func validate(rule *Rule, errs *[]RuleError) {
 		var err error
 		switch rule.Operator {
 		case "equal":
-			val := &TargetEqual{}
+			val := &TargetValue{}
 			err = json.Unmarshal(rule.Assert, val)
 			rule.ParsedTarget = val
 		case "range":
@@ -111,7 +111,7 @@ func validate(rule *Rule, errs *[]RuleError) {
 			err = json.Unmarshal(rule.Assert, val)
 			rule.ParsedTarget = val
 		case "isSubstringOf":
-			val := &TargetIsSubstringOf{}
+			val := &TargetValue{}
 			err = json.Unmarshal(rule.Assert, val)
 			rule.ParsedTarget = val
 		}

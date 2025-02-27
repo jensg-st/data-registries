@@ -8,11 +8,7 @@ import (
 
 type Target map[string]string
 
-type TargetEqual struct {
-	Value string `json:"value"`
-}
-
-type TargetIsSubstringOf struct {
+type TargetValue struct {
 	Value string `json:"value"`
 }
 
@@ -48,7 +44,7 @@ func evaluateTarget(operator string, a any, input string, kind string) bool {
 }
 
 func targetEqual(a any, value string, kind string) bool {
-	target := a.(*TargetEqual)
+	target := a.(*TargetValue)
 	return target.Value == value
 }
 
@@ -65,14 +61,14 @@ func targetRange(a any, value string, kind string) bool {
 
 func targetIsSubstringOf(a any, value string, kind string) bool {
 	//nolint:forcetypeassert
-	target := a.(*TargetIsSubstringOf)
+	target := a.(*TargetValue)
 
 	return strings.Contains(target.Value, value)
 }
 
 func sqlCompileTargetEqual(a any, atrr RuleAttribute) string {
 	//nolint:forcetypeassert
-	target := a.(*TargetEqual)
+	target := a.(*TargetValue)
 	if atrr.Kind == "string" {
 		return fmt.Sprintf(`%s = "%v"`, atrr.Name, target.Value)
 	} else {
@@ -89,7 +85,7 @@ func sqlCompileTargetRange(a any, atrr RuleAttribute) string {
 
 func sqlCompileTargetIsSubstringOf(a any, atrr RuleAttribute) string {
 	//nolint:forcetypeassert
-	target := a.(*TargetIsSubstringOf)
+	target := a.(*TargetValue)
 
 	return fmt.Sprintf(`%s LIKE %%%v%%`, atrr.Name, target.Value)
 }
