@@ -249,7 +249,7 @@ func TestEvaluateRule(t *testing.T) {
 			input: map[string]string{
 				"user.City": "New York",
 			},
-			wantString: `doc.City = "New York"`,
+			wantString: `doc.City = 'New York'`,
 			wantErr:    false,
 		},
 

@@ -208,7 +208,7 @@ func evaluateRule(rule *Rule, input map[string]string) error {
 		if ok {
 			t1 = input[attr1.Name]
 			if attr1.Kind == "string" {
-				t1 = "\"" + input[attr1.Name] + "\""
+				t1 = "'" + input[attr1.Name] + "'"
 			}
 		}
 
@@ -216,7 +216,7 @@ func evaluateRule(rule *Rule, input map[string]string) error {
 		if ok {
 			t2 = input[attr2.Name]
 			if attr2.Kind == "string" {
-				t2 = "\"" + input[attr2.Name] + "\""
+				t2 = "'" + input[attr2.Name] + "'"
 			}
 		}
 
