@@ -6,7 +6,7 @@ functions:
   type: knative-namespace
 - type: knative-workflow
   id: query
-  image: gerke74/query:v1
+  image: direktiv/query:v4
 - id: execute
   type: knative-namespace
   service: /services/execute.yaml
@@ -62,7 +62,7 @@ states:
     input: 
       query: jq(.query)
   transform:
-    query: jq(.return.where)
+    query: jq(.return.data)
     bucket: jq(.bucket)
     table: jq(.table)
   transition: get-registry 
@@ -85,6 +85,7 @@ states:
 
 - id: execute
   type: action
+  log: jq(.)
   action:
     function: execute
     input: 
