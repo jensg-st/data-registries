@@ -80,7 +80,7 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 		whereClauses = append(whereClauses, str)
 	}
 
-	result := "WHERE (" + strings.Join(whereClauses, ") OR (") + ")"
+	result := "WHERE " + strings.Join(whereClauses, " OR ")
 	encoded := base64.StdEncoding.EncodeToString([]byte(result))
 
 	writeJSON(w, result, encoded)
