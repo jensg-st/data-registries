@@ -1,0 +1,75 @@
+direktiv_api: workflow/v1
+
+functions:
+- id: get
+  service: /services/http.yaml
+  type: knative-namespace
+- type: knative-workflow
+  id: query
+  image: gerke74/query
+
+states:
+- id: get-data
+  type: noop
+  log: jq(.)
+  transform:
+    user: jq(.consumer.username)
+    bucket: jq(.body.bucket)
+  transition: get-user-data
+
+- id: get-user-data
+  type: action
+  action:
+    secrets: ["pwd"]
+    function: get
+    input: 
+      method: "GET"
+      url: https://policy.direktiv.io/api/v1/pap/projects/data-registry/user_attributes/users/get?id=jq(.user)
+      headers:
+        Authorization: jq(.secrets.pwd)
+  transform:
+    bucket: jq(.bucket)
+    user: jq(.return.body.data)
+  transition: get-policy-data
+
+- id: get-policy-data
+  type: action
+  action:
+    function: get
+    secrets: ["pwd"]
+    input: 
+      method: "GET"
+      url: https://policy.direktiv.io/api/v1/pap/projects/data-registry/files/tree/?path=data_registries/jq(.bucket)
+      headers:
+        Authorization: jq(.secrets.pwd)
+  transform:
+    query:
+      policies: jq([.return.body.data.children  | .[].data.policy])
+      user: jq(.user)
+    bucket: jq(.bucket)
+  transition: query
+
+- id: query
+  type: action
+  action:
+    function: query
+    input: 
+      query: jq(.query)
+  transform:
+    query: jq(.return.where)
+    bucket: jq(.bucket)
+  transition: get-registry 
+
+- id: get-registry
+  type: action
+  action:
+    secrets: ["pwd"]
+    function: get
+    input: 
+      method: "GET"
+      url: https://policy.direktiv.io/api/v1/pap/projects/data-registry/data_registries?plain=true
+      headers:
+        Authorization: jq(.secrets.pwd)
+  transform:
+    db: jq(.bucket as $b | .return.body.data.[] | select(.name==$b).config)
+
