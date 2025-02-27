@@ -25,6 +25,8 @@ type Rule struct {
 	// only relevant with type=attribute
 	Attribute RuleAttribute `json:"attribute"`
 	// only relevant with type=attribute
+	Attributes []RuleAttribute `json:"attributes"`
+
 	Assert       json.RawMessage `json:"assert"`
 	ParsedTarget any             `json:"-"`
 	BoolValue    string          `json:"-"`
@@ -51,7 +53,7 @@ func validate(rule *Rule, errs *[]RuleError) {
 			Err:  "empty or missing type",
 		})
 	}
-	if !slices.Contains([]string{"group", "attribute", "bool", ""}, rule.Type) {
+	if !slices.Contains([]string{"group", "attribute", "bool", "comparison", ""}, rule.Type) {
 		*errs = append(*errs, RuleError{
 			Name: rule.Name,
 			Err:  "invalid rule type, must be `group`, `bool` or `attribute`",
@@ -138,6 +140,9 @@ func (rule *Rule) Stringer() string {
 	if rule.Type == "attribute" {
 		return rule.BoolValue
 	}
+	if rule.Type == "comparison" {
+		return rule.BoolValue
+	}
 	if rule.Type == "group" && rule.BoolValue != "" {
 		return "( " + rule.BoolValue + " )"
 	}
@@ -183,6 +188,39 @@ func evaluateRule(rule *Rule, input map[string]string) error {
 			boolValue := evaluateTarget(rule.Operator, rule.ParsedTarget, inputField, rule.Attribute.Kind)
 			rule.BoolValue = strconv.FormatBool(boolValue)
 		}
+
+		return nil
+	}
+
+	if rule.Type == "comparison" {
+		if rule.BoolValue != "" {
+			return nil
+		}
+
+		var attr1, attr2 RuleAttribute
+		attr1 = rule.Attributes[0]
+		attr2 = rule.Attributes[1]
+
+		t1 := attr1.Name
+		t2 := attr2.Name
+
+		_, ok := input[attr1.Name]
+		if ok {
+			t1 = input[attr1.Name]
+			if attr1.Kind == "string" {
+				t1 = "\"" + input[attr1.Name] + "\""
+			}
+		}
+
+		_, ok = input[attr2.Name]
+		if ok {
+			t2 = input[attr2.Name]
+			if attr2.Kind == "string" {
+				t2 = "\"" + input[attr2.Name] + "\""
+			}
+		}
+
+		rule.BoolValue = fmt.Sprintf("%s = %s", t1, t2)
 
 		return nil
 	}
@@ -244,6 +282,7 @@ func cloneRule(src *Rule, dist *Rule) {
 	dist.Type = src.Type
 	dist.Name = src.Name
 	dist.Attribute = src.Attribute
+	dist.Attributes = src.Attributes
 	dist.Assert = src.Assert
 	dist.ParsedTarget = src.ParsedTarget
 	dist.BoolValue = src.BoolValue

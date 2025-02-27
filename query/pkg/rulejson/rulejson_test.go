@@ -231,6 +231,75 @@ func TestEvaluateRule(t *testing.T) {
 	}{
 		////////////////////////////////////////////////////////////////////////////////////////
 		{
+			name: "valid rule comparison",
+			rule: &Rule{
+				Type:     "comparison",
+				Operator: "equal",
+				Attributes: []RuleAttribute{
+					{
+						Name: "doc.City",
+						Kind: "string",
+					},
+					{
+						Name: "user.City",
+						Kind: "string",
+					},
+				},
+			},
+			input: map[string]string{
+				"user.City": "New York",
+			},
+			wantString: `doc.City = "New York"`,
+			wantErr:    false,
+		},
+
+		////////////////////////////////////////////////////////////////////////////////////////
+		{
+			name: "valid rule comparison",
+			rule: &Rule{
+				Type:     "comparison",
+				Operator: "equal",
+				Attributes: []RuleAttribute{
+					{
+						Name: "doc.City",
+						Kind: "string",
+					},
+					{
+						Name: "user.City",
+						Kind: "string",
+					},
+				},
+			},
+			input:      map[string]string{},
+			wantString: `doc.City = user.City`,
+			wantErr:    false,
+		},
+		////////////////////////////////////////////////////////////////////////////////////////
+		{
+			name: "valid rule comparison",
+			rule: &Rule{
+				Type:     "comparison",
+				Operator: "equal",
+				Attributes: []RuleAttribute{
+					{
+						Name: "doc.Level",
+						Kind: "number",
+					},
+					{
+						Name: "user.Level",
+						Kind: "number",
+					},
+				},
+			},
+			input: map[string]string{
+				"user.Level": "25",
+			},
+			wantString: `doc.Level = 25`,
+			wantErr:    false,
+		},
+
+		////////////////////////////////////////////////////////////////////////////////////////
+		{
 			name: "valid rule",
 			rule: &Rule{
 				Type:     "bool",
