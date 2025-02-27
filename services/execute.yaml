@@ -1,0 +1,4 @@
+direktiv_api: service/v1
+image: direktiv/execute:v1
+scale: 1
+size: medium

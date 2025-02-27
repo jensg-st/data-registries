@@ -8,16 +8,30 @@ states:
 - id: getter 
   type: action
   action:
+    secrets: ["pwd"]
     function: get
     input: 
       method: "GET"
-      url: "https://policy.direktiv.io/api/v1/pap/projects/data-registry/files/tree/?path=data_registries/"
+      url: "https://policy.direktiv.io/api/v1/pap/projects/data-registry/attribute_schemas"
       headers:
-        Authorization: admin123#
+        Authorization: jq(.secrets.pwd)
   transition: return
 - id: return
   log: jq(.)
   type: noop
-  transform:
-    buckets: jq([.return.body.data.children[] | select(.isDirectory = true) | .path | split("/data_registries/")[1]])
+  transform: |- 
+      js(
+        attrs = data["return"]["body"]["data"]
+        var a=[]
+        for (var i = 0; i < attrs.length; i++) {
+          p = attrs[i].path + "/" + attrs[i].config.table 
+          a.push(p.split(/\/(.+)?/)[1]) 
+        }
+
+        b = [...new Set(a)]
+        data["buckets"] = b
+        delete(data["return"])
+        return data
+      )
+
       

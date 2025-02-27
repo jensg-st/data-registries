@@ -6,7 +6,10 @@ functions:
   type: knative-namespace
 - type: knative-workflow
   id: query
-  image: gerke74/query
+  image: gerke74/query:v1
+- id: execute
+  type: knative-namespace
+  service: /services/execute.yaml
 
 states:
 - id: get-data
@@ -14,7 +17,8 @@ states:
   log: jq(.)
   transform:
     user: jq(.consumer.username)
-    bucket: jq(.body.bucket)
+    bucket: jq(.body.bucket | split("/") | .[0])
+    table: jq(.body.bucket | split("/") | .[1])
   transition: get-user-data
 
 - id: get-user-data
@@ -29,6 +33,7 @@ states:
         Authorization: jq(.secrets.pwd)
   transform:
     bucket: jq(.bucket)
+    table: jq(.table)
     user: jq(.return.body.data)
   transition: get-policy-data
 
@@ -39,14 +44,15 @@ states:
     secrets: ["pwd"]
     input: 
       method: "GET"
-      url: https://policy.direktiv.io/api/v1/pap/projects/data-registry/files/tree/?path=data_registries/jq(.bucket)
+      url: https://policy.direktiv.io/api/v1/pap/projects/data-registry/files/tree/?path=data_registries/jq(.bucket)/jq(.table)
       headers:
         Authorization: jq(.secrets.pwd)
   transform:
     query:
-      policies: jq([.return.body.data.children  | .[].data.policy])
+      policies: jq([.return.body.data.children.[] | select(.isActive==true) | .data.policy])
       user: jq(.user)
     bucket: jq(.bucket)
+    table: jq(.table)
   transition: query
 
 - id: query
@@ -58,6 +64,7 @@ states:
   transform:
     query: jq(.return.where)
     bucket: jq(.bucket)
+    table: jq(.table)
   transition: get-registry 
 
 - id: get-registry
@@ -72,4 +79,15 @@ states:
         Authorization: jq(.secrets.pwd)
   transform:
     db: jq(.bucket as $b | .return.body.data.[] | select(.name==$b).config)
+    where: jq(.query)
+    table: jq(.table)
+  transition: execute
 
+- id: execute
+  type: action
+  action:
+    function: execute
+    input: 
+      data: jq(.)
+  transform:
+    data: jq(.return)

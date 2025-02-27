@@ -17,7 +17,7 @@ type input struct {
 }
 
 const (
-	errCode = "com.azure.%s"
+	errCode = "com.query.%s"
 )
 
 func main() {
@@ -37,8 +37,7 @@ func coreLogic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(aid)
-	da.LogDouble("%s", aid)
+	da.LogDouble(aid, "Hello")
 
 	w.Write([]byte("{ \"where\": \"true\"}"))
 }
