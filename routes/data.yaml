@@ -26,7 +26,7 @@
 
 x-direktiv-api: endpoint/v2
 x-direktiv-config:
-    path: "/buckets"
+    path: "/data"
     allow_anonymous: false
     plugins:
       auth:
